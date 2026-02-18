@@ -4,26 +4,31 @@ const path = require('path');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
-const http = require('http'); // ⬅️ Added
+const http = require('http');
 const connectDB = require('./config/db');
-// ⬅️ Added (we’ll create this file next)
 
 // Load environment variables
 dotenv.config();
 
-// Connect to MongoDB
+// Initialize Express app FIRST
+const app = express();
+
+// Connect to MongoDB (after app initialization)
 connectDB();
 
-// Initialize Express app
-const app = express();
+// Seed initial admin (optional) - after DB connection
+if (process.env.NODE_ENV !== 'production') {
+  const seedAdmin = require('./utils/seedAdmin');
+  seedAdmin();
+}
 
 // Security headers
 app.use(helmet());
 
-// Rate limiting (more permissive for development)
+// Rate limiting
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 1000, // limit each IP to 1000 requests per window (increased for dev)
+  max: 1000,
   message: 'Too many requests from this IP, try again later',
 });
 app.use(limiter);
@@ -35,9 +40,9 @@ const corsOptions = {
   optionsSuccessStatus: 200,
 };
 
-// Middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// IMPORTANT: Body parsers BEFORE routes
+app.use(express.json());              // ✅ Parse JSON bodies
+app.use(express.urlencoded({ extended: true })); // ✅ Parse form data
 app.use(cors(corsOptions));
 
 // Serve uploaded files statically
@@ -51,8 +56,6 @@ const assignmentRoutes = require('./routes/assignmentRoutes.js');
 const submissionRoutes = require('./routes/submissionRoutes.js');
 const notificationRoutes = require('./routes/notificationRoutes.js');
 const { errorHandler } = require('./middleware/errorMiddleware');
-
-
 
 // Mount routes
 app.use('/api/users', userRoutes);
