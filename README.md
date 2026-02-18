@@ -1,71 +1,64 @@
-# 📚 Assignment Portal - MERN Stack Application
+
+---
+
+## 🌐 Live Demo
 
 <div align="center">
 
-![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
-![License](https://img.shields.io/badge/license-MIT-green.svg)
-![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)
-![Node](https://img.shields.io/badge/node-18.x-green)
-![React](https://img.shields.io/badge/react-18.x-blue)
+| Service | URL | Status |
+|---------|-----|--------|
+| **Frontend** | [https://dashring-starship-aeaff5.netlify.app](https://dashring-starship-aeaff5.netlify.app) | 🟢 Live |
+| **Backend API** | [https://assignmentsmadeeasy.onrender.com](https://assignmentsmadeeasy.onrender.com) | 🟢 Live |
+| **Health Check** | [https://assignmentsmadeeasy.onrender.com/api/health](https://assignmentsmadeeasy.onrender.com/api/health) | 🟢 Live |
 
-**A comprehensive assignment management system for students and educators with real-time features**
+</div>
 
-[Live Demo](https://dashring-starship-aeaff5.netlify.app) • 
-[API Documentation](https://assignmentsmadeeasy.onrender.com/api/health) • 
-[Report Bug](https://github.com/yourusername/AssignmentsMadeEasy/issues)
+### 🔑 Test Credentials
 
+| Role | Email | Password |
+|------|-------|----------|
+| **Admin** | `admin@classroom.com` | `admin123` |
+| **Student** | `student@classroom.com` | `student123` |
+
+---
+
+## 📸 Screenshots
+
+<div align="center">
+  <table>
+    <tr>
+      <td><img src="https://via.placeholder.com/400x250?text=Home+Page" alt="Home Page" width="100%"/></td>
+      <td><img src="https://via.placeholder.com/400x250?text=Dashboard" alt="Dashboard" width="100%"/></td>
+    </tr>
+    <tr>
+      <td align="center"><b>🏠 Home Page</b></td>
+      <td align="center"><b>📊 Dashboard</b></td>
+    </tr>
+    <tr>
+      <td><img src="https://via.placeholder.com/400x250?text=Assignments" alt="Assignments" width="100%"/></td>
+      <td><img src="https://via.placeholder.com/400x250?text=Admin+Panel" alt="Admin Panel" width="100%"/></td>
+    </tr>
+    <tr>
+      <td align="center"><b>📝 Assignments</b></td>
+      <td align="center"><b>⚙️ Admin Panel</b></td>
+    </tr>
+  </table>
 </div>
 
 ---
 
-## 📋 Table of Contents
-- [Features](#-features)
-- [Tech Stack](#-tech-stack)
-- [Live Demo](#-live-demo)
-- [Screenshots](#-screenshots)
-- [Installation](#-installation)
-- [Environment Variables](#-environment-variables)
-- [API Reference](#-api-reference)
-- [Project Structure](#-project-structure)
-- [Deployment](#-deployment)
-- [Contributing](#-contributing)
-- [License](#-license)
-- [Contact](#-contact)
+## 💻 Installation
 
----
+### Prerequisites
+- Node.js (v18 or higher)
+- npm or yarn
+- MongoDB Atlas account
+- Git
 
-## ✨ Features
+### 📥 Clone Repository
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/AssignmentsMadeEasy.git
 
-### 👨‍🏫 **For Admins**
-| Feature | Description |
-|---------|-------------|
-| **📋 Assignment Management** | Create, edit, and delete assignments with due dates |
-| **📊 Submission Overview** | View all student submissions in one place |
-| **✅ Grading System** | Grade submissions with feedback and comments |
-| **📢 Real-time Announcements** | Post announcements that appear instantly to students |
-| **👥 User Management** | View all registered users and their roles |
-| **📈 Analytics Dashboard** | Track submission rates and student performance |
-
-### 🎓 **For Students**
-| Feature | Description |
-|---------|-------------|
-| **📝 Assignment Dashboard** | View all assignments with deadlines |
-| **📎 File Upload** | Submit assignments with file attachments (PDF, DOC, images) |
-| **🔄 Real-time Updates** | Get instant notifications for new announcements |
-| **📊 Progress Tracking** | View grades and feedback from instructors |
-| **🔔 Notifications** | Stay updated with assignment deadlines and grades |
-
-### 🚀 **Technical Features**
-- 🔐 **JWT Authentication** - Secure login with role-based access control
-- ⚡ **Real-time Updates** - WebSocket integration for live announcements
-- 📱 **Responsive Design** - Works perfectly on desktop, tablet, and mobile
-- 🌙 **Dark Mode** - Built-in theme switching with system preference detection
-- 📁 **File Management** - Multer for file uploads with size limits
-- 📧 **Email Notifications** - OTP-based authentication and reminders
-- 🔄 **Auto-deployment** - CI/CD with GitHub Actions
-
----
-
-## 🛠️ Tech Stack
-
-### Frontend
+# Navigate to project
+cd AssignmentsMadeEasy
