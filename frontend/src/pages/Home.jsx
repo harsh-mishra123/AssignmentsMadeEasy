@@ -346,6 +346,7 @@ const Home = () => {
             © 2025 AssignMaster. All rights reserved.
           </div>
         </div>
+        
       </footer>
 
       <style>{`
