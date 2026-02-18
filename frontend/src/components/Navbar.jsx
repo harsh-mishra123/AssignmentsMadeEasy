@@ -304,6 +304,7 @@ const Navbar = () => {
       </nav>
 
       {/* Spacer */}
+      
       <div className="h-20" />
     </>
   );
