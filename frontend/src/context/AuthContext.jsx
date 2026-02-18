@@ -93,7 +93,7 @@ const authReducer = (state, action) => {
 const AuthContext = createContext();
 
 // Auth provider component
-export const AuthProvider = ({ children }) => {
+export const AuthProvider = ({ children, navigate }) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
 
   // Initialize auth state from localStorage
@@ -110,7 +110,6 @@ export const AuthProvider = ({ children }) => {
       }
     } catch (error) {
       console.error('Error initializing auth:', error);
-      // Clear corrupted data
       localStorage.removeItem('token');
       localStorage.removeItem('user');
     }
@@ -118,7 +117,7 @@ export const AuthProvider = ({ children }) => {
     dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: false });
   }, []);
 
-  // Login function
+  // ✅ LOGIN FUNCTION - NO AUTO REDIRECT (stays on homepage)
   const login = async (credentials) => {
     dispatch({ type: AUTH_ACTIONS.LOGIN_START });
     
@@ -126,6 +125,7 @@ export const AuthProvider = ({ children }) => {
       console.log('Attempting login with:', credentials.email);
       const response = await authAPI.login(credentials);
       console.log('Login successful:', response);
+      
       const { token, id, name, email, role } = response;
       const user = { id, name, email, role };
       
@@ -134,9 +134,15 @@ export const AuthProvider = ({ children }) => {
         payload: { user, token },
       });
       
+      // ✅ HOME PAGE PE HI RAHO - KOI REDIRECT NAHI!
+      console.log('✅ Login successful, staying on homepage');
+      
+      // ❌ REDIRECT COMPLETELY HATAA DIYA
+      // No navigate, no window.location - user stays on current page
+      
       return response;
     } catch (error) {
-      console.error('Login error in context:', error);
+      console.error('Login error:', error);
       const errorMessage = error.message || 'Login failed. Please try again.';
       dispatch({
         type: AUTH_ACTIONS.LOGIN_FAILURE,
@@ -146,7 +152,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Register function
+  // ✅ REGISTER FUNCTION - NO AUTO REDIRECT (stays on homepage)
   const register = async (userData) => {
     dispatch({ type: AUTH_ACTIONS.REGISTER_START });
     
@@ -155,9 +161,16 @@ export const AuthProvider = ({ children }) => {
       const response = await authAPI.register(userData);
       console.log('Registration successful:', response);
       dispatch({ type: AUTH_ACTIONS.REGISTER_SUCCESS });
+      
+      // ✅ HOME PAGE PE HI RAHO - KOI REDIRECT NAHI!
+      console.log('✅ Registration successful, staying on homepage');
+      
+      // ❌ REDIRECT COMPLETELY HATAA DIYA
+      // No navigate, no window.location - user stays on current page
+      
       return response;
     } catch (error) {
-      console.error('Registration error in context:', error);
+      console.error('Registration error:', error);
       const errorMessage = error.message || 'Registration failed. Please try again.';
       dispatch({
         type: AUTH_ACTIONS.REGISTER_FAILURE,
@@ -167,7 +180,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Logout function
+  // ✅ LOGOUT FUNCTION - Redirect to homepage
   const logout = async () => {
     try {
       await authAPI.logout();
@@ -175,6 +188,15 @@ export const AuthProvider = ({ children }) => {
       console.error('Logout error:', error);
     } finally {
       dispatch({ type: AUTH_ACTIONS.LOGOUT });
+      
+      // ✅ LOGOUT KE BAAD HOMEPAGE PE REDIRECT
+      console.log('✅ Logout, redirecting to homepage');
+      
+      if (navigate) {
+        navigate('/');
+      } else {
+        window.location.href = '/';
+      }
     }
   };
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import { createBrowserRouter, Navigate } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
+import AuthProviderWrapper from './context/AuthProviderWrapper'; // ✅ USE WRAPPER
 import { AnimatePresence } from 'framer-motion';
 
 // Layouts
@@ -22,21 +22,22 @@ import Announcements from './pages/Announcements';
 import Profile from './pages/Profile';
 import Settings from './pages/Settings';
 import Help from './pages/Help';
+import Welcome from './pages/Welcome';
 
 // Error Pages
 import NotFound from './pages/NotFound';
 import ServerError from './pages/ServerError';
 import Unauthorized from './pages/Unauthorized';
 
-// Wrapper component for providers with animations
+// Wrapper component for providers with animations - UPDATED
 const AppProviders = ({ children }) => {
   return (
     <ThemeProvider>
-      <AuthProvider>
+      <AuthProviderWrapper> {/* ✅ USING WRAPPER INSTEAD OF DIRECT AuthProvider */}
         <AnimatePresence mode="wait">
           {children}
         </AnimatePresence>
-      </AuthProvider>
+      </AuthProviderWrapper>
     </ThemeProvider>
   );
 };
@@ -102,6 +103,21 @@ const routes = [
       {
         index: true,
         element: <Register />,
+      }
+    ]
+  },
+  // WELCOME ROUTE
+  {
+    path: '/welcome',
+    element: <AppProviders><DashboardLayout /></AppProviders>,
+    metadata: {
+      title: 'Welcome - Assignment Portal',
+      description: 'Welcome to your dashboard'
+    },
+    children: [
+      {
+        index: true,
+        element: <Welcome />,
       }
     ]
   },
