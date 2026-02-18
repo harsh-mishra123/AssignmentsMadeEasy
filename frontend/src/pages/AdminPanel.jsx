@@ -32,24 +32,33 @@ const AdminPanel = () => {
     if (isAdmin()) {
       loadAdminData();
     }
-  }, []);
+  }, [isAdmin]);
 
+  // 🔥 FIXED: Safe data loading with error handling
   const loadAdminData = async () => {
     try {
       const [usersData, assignmentsData, submissionsData] = await Promise.all([
-        authAPI.getAllUsers(),
-        assignmentsAPI.getAllAssignments(),
-        submissionsAPI.getAllSubmissions()
+        authAPI.getAllUsers().catch(err => {
+          console.error('Error loading users:', err);
+          return [];
+        }),
+        assignmentsAPI.getAllAssignments().catch(err => {
+          console.error('Error loading assignments:', err);
+          return [];
+        }),
+        submissionsAPI.getAllSubmissions().catch(err => {
+          console.error('Error loading submissions:', err);
+          return [];
+        })
       ]);
       
-      setUsers(usersData);
-      setAssignments(assignmentsData);
-      setSubmissions(submissionsData || []);
+      // Safely set data with array checks
+      setUsers(Array.isArray(usersData) ? usersData : []);
+      setAssignments(Array.isArray(assignmentsData) ? assignmentsData : []);
+      setSubmissions(Array.isArray(submissionsData) ? submissionsData : []);
+      
     } catch (error) {
       console.error('Failed to load admin data:', error);
-      setUsers([]);
-      setAssignments([]);
-      setSubmissions([]);
     } finally {
       setLoading(false);
     }
@@ -58,9 +67,10 @@ const AdminPanel = () => {
   const loadSubmissionsForAssignment = async (assignmentId) => {
     try {
       const data = await assignmentsAPI.getAssignmentSubmissions(assignmentId);
-      setSubmissions(data);
+      setSubmissions(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Failed to load submissions:', error);
+      setSubmissions([]);
     }
   };
 
@@ -136,7 +146,7 @@ const AdminPanel = () => {
       setShowGradeModal(false);
       setGradingSubmission(null);
       setGradeForm({ grade: '', feedback: '' });
-      loadAdminData(); // Reload data to show updated grade
+      loadAdminData();
       alert('Submission graded successfully!');
     } catch (error) {
       console.error('Failed to grade submission:', error);
@@ -319,113 +329,125 @@ const AdminPanel = () => {
         </nav>
       </div>
 
-      {/* Users Tab */}
+      {/* 🔥 FIXED: Users Tab with null checks */}
       {activeTab === 'users' && (
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <h2 className="text-lg font-medium text-gray-900 dark:text-white">
-              Registered Users
+              Registered Users ({users.length})
             </h2>
           </div>
           <div className="divide-y divide-gray-200 dark:divide-gray-700">
-            {users.map((user) => (
-              <div key={user._id} className="px-6 py-4 flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-900 dark:text-white">
-                    {user.name}
-                  </p>
-                  <p className="text-sm text-gray-500">{user.email}</p>
+            {users.length > 0 ? (
+              users.map((user) => (
+                <div key={user?._id || user?.id || Math.random()} className="px-6 py-4 flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-900 dark:text-white">
+                      {user?.name || 'N/A'}
+                    </p>
+                    <p className="text-sm text-gray-500">{user?.email || 'N/A'}</p>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                      user?.role === 'admin' 
+                        ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+                        : 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
+                    }`}>
+                      {user?.role || 'student'}
+                    </span>
+                    <span className="text-xs text-gray-500">
+                      {user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}
+                    </span>
+                  </div>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                    user.role === 'admin' 
-                      ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
-                      : 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
-                  }`}>
-                    {user.role}
-                  </span>
-                  <span className="text-xs text-gray-500">
-                    {new Date(user.createdAt).toLocaleDateString()}
-                  </span>
-                </div>
+              ))
+            ) : (
+              <div className="px-6 py-8 text-center text-gray-500">
+                No users found
               </div>
-            ))}
+            )}
           </div>
         </div>
       )}
 
-      {/* Assignments Tab */}
+      {/* 🔥 FIXED: Assignments Tab with null checks */}
       {activeTab === 'assignments' && (
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
           <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <h2 className="text-lg font-medium text-gray-900 dark:text-white">
-              All Assignments
+              All Assignments ({assignments.length})
             </h2>
           </div>
           <div className="p-6 space-y-4">
-            {assignments.map((assignment) => (
-              <div key={assignment._id} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-                <div className="flex justify-between items-start">
-                  <div className="flex-1">
-                    <h3 className="font-medium text-gray-900 dark:text-white">
-                      {assignment.title}
-                    </h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                      {assignment.description}
-                    </p>
-                    <p className="text-xs text-gray-500 mt-2">
-                      Due: {new Date(assignment.dueDate).toLocaleDateString()}
-                    </p>
-                  </div>
-                  <div className="flex space-x-2 ml-4">
-                    <Button 
-                      size="sm" 
-                      variant="outline"
-                      onClick={() => {
-                        setActiveTab('submissions');
-                        loadSubmissionsForAssignment(assignment._id);
-                      }}
-                    >
-                      View Submissions
-                    </Button>
-                    <button
-                      onClick={() => handleEditAssignment(assignment)}
-                      className="p-2 text-blue-600 hover:bg-blue-100 dark:hover:bg-blue-900 rounded-lg transition-colors"
-                      title="Edit Assignment"
-                    >
-                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                      </svg>
-                    </button>
-                    <button
-                      onClick={() => handleDeleteAssignment(assignment._id)}
-                      className="p-2 text-red-600 hover:bg-red-100 dark:hover:bg-red-900 rounded-lg transition-colors"
-                      title="Delete Assignment"
-                    >
-                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                      </svg>
-                    </button>
+            {assignments.length > 0 ? (
+              assignments.map((assignment) => (
+                <div key={assignment?._id || Math.random()} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                  <div className="flex justify-between items-start">
+                    <div className="flex-1">
+                      <h3 className="font-medium text-gray-900 dark:text-white">
+                        {assignment?.title || 'Untitled'}
+                      </h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                        {assignment?.description || 'No description'}
+                      </p>
+                      <p className="text-xs text-gray-500 mt-2">
+                        Due: {assignment?.dueDate ? new Date(assignment.dueDate).toLocaleDateString() : 'No due date'}
+                      </p>
+                    </div>
+                    <div className="flex space-x-2 ml-4">
+                      <Button 
+                        size="sm" 
+                        variant="outline"
+                        onClick={() => {
+                          setActiveTab('submissions');
+                          if (assignment?._id) loadSubmissionsForAssignment(assignment._id);
+                        }}
+                      >
+                        View Submissions
+                      </Button>
+                      <button
+                        onClick={() => assignment && handleEditAssignment(assignment)}
+                        className="p-2 text-blue-600 hover:bg-blue-100 dark:hover:bg-blue-900 rounded-lg transition-colors"
+                        title="Edit Assignment"
+                      >
+                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                      </button>
+                      <button
+                        onClick={() => assignment?._id && handleDeleteAssignment(assignment._id)}
+                        className="p-2 text-red-600 hover:bg-red-100 dark:hover:bg-red-900 rounded-lg transition-colors"
+                        title="Delete Assignment"
+                      >
+                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    </div>
                   </div>
                 </div>
+              ))
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                No assignments found
               </div>
-            ))}
+            )}
           </div>
         </div>
       )}
 
-      {/* Submissions Tab */}
+      {/* 🔥 FIXED: Submissions Tab with null checks */}
       {activeTab === 'submissions' && (
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
           <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-medium text-gray-900 dark:text-white">
-                All Submissions
+                All Submissions ({submissions.length})
               </h2>
               <div className="flex items-center space-x-4 text-sm text-gray-500">
                 <span>Total: {submissions.length}</span>
-                <span>Graded: {submissions.filter(s => s.grade).length}</span>
-                <span>Pending: {submissions.filter(s => !s.grade).length}</span>
+                <span>Graded: {submissions.filter(s => s?.grade).length}</span>
+                <span>Pending: {submissions.filter(s => !s?.grade).length}</span>
               </div>
             </div>
           </div>
@@ -433,31 +455,31 @@ const AdminPanel = () => {
             {submissions.length > 0 ? (
               <div className="space-y-4">
                 {submissions.map((submission) => (
-                  <div key={submission._id} className="border border-gray-200 dark:border-gray-700 rounded-lg p-6">
+                  <div key={submission?._id || Math.random()} className="border border-gray-200 dark:border-gray-700 rounded-lg p-6">
                     <div className="flex justify-between items-start">
                       <div className="flex-1">
                         <div className="flex items-center space-x-2 mb-2">
                           <h3 className="font-medium text-gray-900 dark:text-white">
-                            {submission.assignment?.title || 'Assignment'}
+                            {submission?.assignment?.title || 'Assignment'}
                           </h3>
                           <span className="text-sm text-gray-500">•</span>
                           <span className="text-sm text-gray-600 dark:text-gray-400">
-                            {submission.student?.name || submission.student?.email || 'Unknown Student'}
+                            {submission?.student?.name || submission?.student?.email || 'Unknown Student'}
                           </span>
                         </div>
                         
                         <p className="text-gray-600 dark:text-gray-400 mt-2">
-                          {submission.content}
+                          {submission?.content || 'No content'}
                         </p>
                         
                         <div className="flex items-center space-x-4 mt-3 text-sm text-gray-500">
-                          <span>Submitted: {new Date(submission.createdAt).toLocaleDateString()}</span>
-                          {submission.file && (
+                          <span>Submitted: {submission?.createdAt ? new Date(submission.createdAt).toLocaleDateString() : 'N/A'}</span>
+                          {submission?.file && (
                             <span className="text-blue-600 dark:text-blue-400">📎 File attached</span>
                           )}
                         </div>
 
-                        {submission.feedback && (
+                        {submission?.feedback && (
                           <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
                             <p className="text-sm font-medium text-blue-900 dark:text-blue-300">Feedback:</p>
                             <p className="text-blue-800 dark:text-blue-200 mt-1">{submission.feedback}</p>
@@ -466,7 +488,7 @@ const AdminPanel = () => {
                       </div>
                       
                       <div className="flex flex-col items-end space-y-2 ml-4">
-                        {submission.grade ? (
+                        {submission?.grade ? (
                           <span className="px-3 py-1 text-sm font-medium bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300 rounded-full">
                             Grade: {submission.grade}/100
                           </span>
@@ -478,10 +500,10 @@ const AdminPanel = () => {
                         
                         <Button
                           size="sm"
-                          onClick={() => handleGradeSubmission(submission)}
-                          variant={submission.grade ? "outline" : "primary"}
+                          onClick={() => submission && handleGradeSubmission(submission)}
+                          variant={submission?.grade ? "outline" : "primary"}
                         >
-                          {submission.grade ? "Update Grade" : "Grade Submission"}
+                          {submission?.grade ? "Update Grade" : "Grade Submission"}
                         </Button>
                       </div>
                     </div>

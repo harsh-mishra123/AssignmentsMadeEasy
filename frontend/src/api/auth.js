@@ -50,12 +50,23 @@ export const authAPI = {
     }
   },
 
-  // Get all users (for admin)
+  // 🔥 FIXED: Get all users (for admin)
   getAllUsers: async () => {
     try {
       const response = await api.get('/users');
-      return response.data;
+      // Handle different response structures
+      if (Array.isArray(response.data)) {
+        return response.data; // Direct array
+      } else if (response.data.users && Array.isArray(response.data.users)) {
+        return response.data.users; // { users: [...] }
+      } else if (response.data.data && Array.isArray(response.data.data)) {
+        return response.data.data; // { data: [...] }
+      } else {
+        console.warn('Unexpected users response structure:', response.data);
+        return []; // Return empty array as fallback
+      }
     } catch (error) {
+      console.error('Error fetching users:', error);
       throw error.response?.data || error.message;
     }
   },
