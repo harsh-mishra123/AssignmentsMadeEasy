@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import { useTheme } from '../context/ThemeContext'; // Add this
 import Button from '../components/Button';
 import { FullScreenLoader } from '../components/Loader';
 import { motion } from 'framer-motion';
@@ -14,11 +15,14 @@ import {
   FiClock,
   FiShield,
   FiStar,
-  FiArrowRight
+  FiArrowRight,
+  FiSun,
+  FiMoon
 } from 'react-icons/fi';
 
 const Home = () => {
   const { isAuthenticated, loading } = useAuth();
+  const { theme, toggleTheme } = useTheme(); // Add this
 
   if (loading) {
     return <FullScreenLoader />;
@@ -83,7 +87,7 @@ const Home = () => {
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-pink-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000" />
       </div>
 
-      {/* Navigation */}
+      {/* Navigation with Dark Mode Toggle */}
       <nav className="relative z-10 bg-white/70 dark:bg-gray-900/70 backdrop-blur-lg border-b border-gray-200 dark:border-gray-800">
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
@@ -100,18 +104,29 @@ const Home = () => {
               </span>
             </motion.div>
 
-            <motion.div 
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="flex items-center space-x-4"
-            >
+            <div className="flex items-center space-x-4">
+              {/* 🌙 DARK MODE TOGGLE - YEH ADD KIYA */}
+              <motion.button
+                whileTap={{ scale: 0.95 }}
+                whileHover={{ scale: 1.1 }}
+                onClick={toggleTheme}
+                className="p-2.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                aria-label="Toggle theme"
+              >
+                {theme === 'light' ? (
+                  <FiMoon className="h-5 w-5" />
+                ) : (
+                  <FiSun className="h-5 w-5" />
+                )}
+              </motion.button>
+
               <Link to="/login">
                 <Button variant="ghost" size="sm">Sign In</Button>
               </Link>
               <Link to="/register">
                 <Button size="sm">Get Started</Button>
               </Link>
-            </motion.div>
+            </div>
           </div>
         </div>
       </nav>
@@ -278,7 +293,6 @@ const Home = () => {
             </Link>
           </div>
 
-          {/* Decorative elements */}
           <div className="absolute top-0 right-0 -mt-20 -mr-20 h-64 w-64 rounded-full bg-white/10 blur-3xl" />
           <div className="absolute bottom-0 left-0 -mb-20 -ml-20 h-64 w-64 rounded-full bg-purple-500/20 blur-3xl" />
         </motion.div>
@@ -334,8 +348,7 @@ const Home = () => {
         </div>
       </footer>
 
-      {/* Add animation styles */}
-      <style jsx>{`
+      <style>{`
         @keyframes blob {
           0% { transform: translate(0px, 0px) scale(1); }
           33% { transform: translate(30px, -50px) scale(1.1); }

@@ -73,7 +73,7 @@ const Navbar = () => {
       }`}>
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-20">
-            {/* Logo with Animation */}
+            {/* Logo */}
             <Link 
               to="/dashboard" 
               className="flex items-center space-x-3 group"
@@ -89,7 +89,7 @@ const Navbar = () => {
                 </div>
               </motion.div>
               <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                Assignment Portal
+                AssignMaster
               </span>
             </Link>
 
@@ -129,7 +129,7 @@ const Navbar = () => {
               {/* Notifications */}
               <NotificationBell />
 
-              {/* Theme toggle with animation */}
+              {/* 🌙 DARK MODE TOGGLE - YEH ADD KIYA */}
               <motion.button
                 whileTap={{ scale: 0.95 }}
                 whileHover={{ scale: 1.1 }}
@@ -146,7 +146,7 @@ const Navbar = () => {
                       exit={{ rotate: 90, opacity: 0 }}
                       transition={{ duration: 0.2 }}
                     >
-                      <FiSun className="h-5 w-5" />
+                      <FiMoon className="h-5 w-5" /> {/* Light mode mein moon dikhega */}
                     </motion.div>
                   ) : (
                     <motion.div
@@ -156,7 +156,7 @@ const Navbar = () => {
                       exit={{ rotate: -90, opacity: 0 }}
                       transition={{ duration: 0.2 }}
                     >
-                      <FiMoon className="h-5 w-5" />
+                      <FiSun className="h-5 w-5" /> {/* Dark mode mein sun dikhega */}
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -182,17 +182,31 @@ const Navbar = () => {
                   </div>
                 </motion.button>
 
-                {/* User dropdown menu */}
+                {/* User dropdown */}
                 <AnimatePresence>
                   {showUserMenu && (
                     <motion.div
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -10 }}
-                      transition={{ duration: 0.2 }}
                       className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden"
                     >
                       <div className="p-2">
+                        <Link
+                          to="/profile"
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700 rounded-lg"
+                          onClick={() => setShowUserMenu(false)}
+                        >
+                          Profile
+                        </Link>
+                        <Link
+                          to="/settings"
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700 rounded-lg"
+                          onClick={() => setShowUserMenu(false)}
+                        >
+                          Settings
+                        </Link>
+                        <hr className="my-2 border-gray-200 dark:border-gray-700" />
                         <button
                           onClick={handleLogout}
                           className="w-full flex items-center space-x-2 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20 rounded-lg transition-colors"
@@ -219,7 +233,6 @@ const Navbar = () => {
                       initial={{ rotate: -90, opacity: 0 }}
                       animate={{ rotate: 0, opacity: 1 }}
                       exit={{ rotate: 90, opacity: 0 }}
-                      transition={{ duration: 0.2 }}
                     >
                       <FiX className="h-5 w-5" />
                     </motion.div>
@@ -229,7 +242,6 @@ const Navbar = () => {
                       initial={{ rotate: 90, opacity: 0 }}
                       animate={{ rotate: 0, opacity: 1 }}
                       exit={{ rotate: -90, opacity: 0 }}
-                      transition={{ duration: 0.2 }}
                     >
                       <FiMenu className="h-5 w-5" />
                     </motion.div>
@@ -240,14 +252,13 @@ const Navbar = () => {
           </div>
         </div>
 
-        {/* Mobile menu with animation */}
+        {/* Mobile menu */}
         <AnimatePresence>
           {isMenuOpen && (
             <motion.div
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.3 }}
               className="lg:hidden border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 overflow-hidden"
             >
               <div className="container mx-auto px-4 py-4">
@@ -270,6 +281,21 @@ const Navbar = () => {
                       </Link>
                     );
                   })}
+                  
+                  {/* Mobile dark mode toggle */}
+                  <button
+                    onClick={toggleTheme}
+                    className="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800 transition-colors"
+                  >
+                    {theme === 'light' ? (
+                      <FiMoon className="h-5 w-5" />
+                    ) : (
+                      <FiSun className="h-5 w-5" />
+                    )}
+                    <span className="font-medium">
+                      {theme === 'light' ? 'Dark Mode' : 'Light Mode'}
+                    </span>
+                  </button>
                 </div>
               </div>
             </motion.div>
@@ -277,7 +303,7 @@ const Navbar = () => {
         </AnimatePresence>
       </nav>
 
-      {/* Spacer to prevent content from hiding under fixed navbar */}
+      {/* Spacer */}
       <div className="h-20" />
     </>
   );
