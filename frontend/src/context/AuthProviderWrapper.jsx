@@ -4,7 +4,7 @@ import { AuthProvider } from './AuthContext';
 
 const AuthProviderWrapper = ({ children }) => {
   const navigate = useNavigate();
-  console.log('✅ AuthProviderWrapper - navigate available:', !!navigate);
+  console.log(' AuthProviderWrapper - navigate available:', !!navigate);
   
   // IMPORTANT: navigate function ko prop ke through pass karo
   return (

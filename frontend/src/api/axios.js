@@ -1,56 +1,56 @@
-import axios from 'axios';
+import axios from "axios";
 
-// Create axios instance with base configuration
+// Fail fast if env is missing
+const API_URL = import.meta.env.VITE_API_URL;
+
+if (!API_URL) {
+  throw new Error("VITE_API_URL is not defined in environment variables");
+}
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:4040/api',
+  baseURL: `${API_URL}/api`,
   timeout: 10000,
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
 });
 
-// Request interceptor to add auth token
+// Request interceptor
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
-// Response interceptor to handle common errors
+// Response interceptor
 api.interceptors.response.use(
-  (response) => {
-    return response;
-  },
+  (response) => response,
   (error) => {
-    // Handle network errors
     if (!error.response) {
-      console.error('Network Error:', error.message);
-      return Promise.reject(new Error('Network error. Please check your connection.'));
+      console.error("Network Error:", error.message);
+      return Promise.reject(
+        new Error("Network error. Please check your connection.")
+      );
     }
 
-    if (error.response?.status === 401) {
-      // Token expired or invalid
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      // Only redirect if not on login page
-      if (!window.location.pathname.includes('/login')) {
-        window.location.href = '/login';
+    if (error.response.status === 401) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("username");
+
+      if (!window.location.pathname.includes("/login")) {
+        window.location.href = "/";
       }
-    } else if (error.response?.status === 403) {
-      // Forbidden - insufficient permissions
-      console.error('Access denied');
-    } else if (error.response?.status >= 500) {
-      // Server error
-      console.error('Server error:', error.response.data);
     }
-    
+
+    if (error.response.status >= 500) {
+      console.error("Server error:", error.response.data);
+    }
+
     return Promise.reject(error);
   }
 );
